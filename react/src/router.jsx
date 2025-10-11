@@ -3,6 +3,7 @@ import Dashboard from "./views/Dashboard";
 import Surveys from "./views/Surveys";
 import Login from "./views/Login";
 import Signup from "./views/Signup";
+import GuestLayout from "./components/GuestLayout";
 
 const router = createBrowserRouter([
     {
@@ -14,12 +15,18 @@ const router = createBrowserRouter([
         element: <Surveys />
     },
     {
-        path: "/login",
-        element: <Login />
-    },
-    {
-        path: "/signup",
-        element: <Signup />
+        path: "/",
+        element: <GuestLayout />,
+        children: [
+            {
+                path: "/login",
+                element: <Login />
+            },
+            {
+                path: "/signup",
+                element: <Signup />
+            }
+        ]
     }
 ]);
 

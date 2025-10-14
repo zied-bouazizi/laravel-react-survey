@@ -177,10 +177,7 @@ const tmpSurveys = [
 ]
 
 export const ContextProvider = ({ children }) => {
-    const [currentUser, setCurrentUser] = useState({
-        name: 'Tom Cook',
-        email: 'tom@example.com'
-    })
+    const [currentUser, setCurrentUser] = useState({})
     const [userToken, _setUserToken] = useState(localStorage.getItem('TOKEN') || '')
     const [surveys, setSurveys] = useState([...tmpSurveys])
 

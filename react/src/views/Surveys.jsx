@@ -11,8 +11,13 @@ export default function Surveys() {
   const [loading, setLoading] = useState(false);
   const [meta, setMeta] = useState({});
 
-  const onDeleteClick = (ev) => {
-    ev.preventDefault()
+  const onDeleteClick = (id) => {
+    if (window.confirm("Are you sure you want to delete this survey?")) {
+      axiosClient.delete(`/survey/${id}`)
+        .then(() => {
+          getSurveys();
+        });
+    }
   }
 
   const onPageClick = (link) => {

@@ -6,8 +6,10 @@ import axiosClient from "../axios.js";
 import SurveyQuestions from "../components/SurveyQuestions.jsx";
 import TButton from "../components/core/TButton.jsx";
 import { v4 as uuidv4 } from "uuid";
+import { useStateContext } from "../contexts/ContextProvider.jsx";
 
 export default function SurveyView() {
+    const { showToast } = useStateContext();
     const navigate = useNavigate();
     const { id } = useParams();
     const [survey, setSurvey] = useState({
@@ -57,6 +59,11 @@ export default function SurveyView() {
         }
             res.then(() => {
                 navigate("/surveys");
+                if (id) {
+                    showToast('The survey was updated');
+                } else {
+                    showToast('The survey was created');
+                }
             })
             .catch((err) => {
                 if (err && err.response) {

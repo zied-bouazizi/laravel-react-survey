@@ -5,8 +5,10 @@ import SurveyListItem from "../components/SurveyListItem";
 import { useEffect, useState } from "react";
 import axiosClient from "../axios";
 import PaginationLinks from "../components/PaginationLinks";
+import { useStateContext } from "../contexts/ContextProvider";
 
 export default function Surveys() {
+  const { showToast } = useStateContext();
   const [surveys, setSurveys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [meta, setMeta] = useState({});
@@ -16,6 +18,7 @@ export default function Surveys() {
       axiosClient.delete(`/survey/${id}`)
         .then(() => {
           getSurveys();
+          showToast('The survey was deleted');
         });
     }
   }

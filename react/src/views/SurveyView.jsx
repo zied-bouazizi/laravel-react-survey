@@ -1,4 +1,4 @@
-import { PhotoIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { LinkIcon, PhotoIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import PageComponent from "../components/PageComponent";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -87,6 +87,16 @@ export default function SurveyView() {
         setSurvey({ ...survey });
     };
 
+    const onDelete = (id) => {
+        if (window.confirm("Are you sure you want to delete this survey?")) {
+        axiosClient.delete(`/survey/${id}`)
+            .then(() => {
+            navigate('/surveys');
+            showToast('The survey was deleted');
+            });
+        }
+    }
+
     useEffect(() => {
         if (id) {
             setLoading(true);
@@ -99,7 +109,23 @@ export default function SurveyView() {
     }, []);
 
     return (
-        <PageComponent title={!id ? 'Create new Survey' : 'Update Survey'}>
+        <PageComponent 
+            title={!id ? 'Create new Survey' : 'Update Survey'}
+            buttons={
+                <>
+                    <div className="flex gap-2">
+                        <TButton color="green" href={`/survey/public/${survey.slug}`}>
+                            <LinkIcon className="h-4 w-4 mr-2" />
+                            Public Link
+                        </TButton>
+                        <TButton color="red" onClick={ev => onDelete(survey.id)}>
+                            <TrashIcon className="h-4 w-4 mr-2" />
+                            Delete
+                        </TButton>
+                    </div>
+                </>
+            }
+        >
             {loading && <div className="text-center text-lg">loading...</div>}
             {!loading && 
                 <form action="#" method="POST" onSubmit={onSubmit}>

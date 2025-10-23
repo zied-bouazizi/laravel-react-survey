@@ -1,7 +1,8 @@
 import axios from "axios";
+import router from "./router";
 
 const axiosClient = axios.create({
-    baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api`
 });
 
 axiosClient.interceptors.request.use((config) => {
@@ -16,7 +17,10 @@ axiosClient.interceptors.response.use((response) => {
     localStorage.removeItem('TOKEN');
     window.location.reload();
     return error;
+  } else if (error.response && error.response.status === 404) {
+    router.navigate('/not-found');
   }
+
   throw error;
 });
 

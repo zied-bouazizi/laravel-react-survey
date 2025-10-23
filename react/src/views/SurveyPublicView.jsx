@@ -2,31 +2,40 @@ import { useParams } from "react-router-dom";
 import axiosClient from "../axios";
 import { useEffect, useState } from "react";
 import PublicQuestionView from "../components/PublicQuestionView";
+import NotFound from "./NotFound";
 
 export default function SurveyPublicView() {
     const { slug } = useParams();
     const [survey, setSurvey] = useState({
         questions: []
     });
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [notFound, setNotFound] = useState(false);
     const [surveyFinished, setSurveyFinished] = useState(false);
     const answers = {};
 
     useEffect(() => {
-        setLoading(true);
         axiosClient.get(`/survey/get-by-slug/${slug}`)
         .then(({ data }) => {
-            setLoading(false);
             setSurvey(data.data);
         })
-        .catch(() => {
-            setLoading(false);
-        });
+        .catch((error) => {
+          if (error.response && error.response.status === 404) {
+              setNotFound(true);
+          }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
     }, []);
+
+    if (notFound) {
+     return <NotFound />;
+    }
 
     function answerChanged(question, value) {
         answers[question.id] = value;
-    };
+    }
 
     function onSubmit(ev) {
         ev.preventDefault();
@@ -35,7 +44,7 @@ export default function SurveyPublicView() {
             .then(() => {
                 setSurveyFinished(true);
             });
-    };
+    }
 
     return (
         <div>

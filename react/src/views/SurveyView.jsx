@@ -7,6 +7,7 @@ import SurveyQuestions from "../components/SurveyQuestions.jsx";
 import TButton from "../components/core/TButton.jsx";
 import { v4 as uuidv4 } from "uuid";
 import { useStateContext } from "../contexts/ContextProvider.jsx";
+import NotFound from "./NotFound.jsx";
 
 export default function SurveyView() {
     const { showToast } = useStateContext();
@@ -22,7 +23,8 @@ export default function SurveyView() {
         expire_date: "",
         questions: []
     })
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [notFound, setNotFound] = useState(false);
     const [errors, setErrors] = useState("");
 
     const onImageChoose = (ev) => {
@@ -99,14 +101,23 @@ export default function SurveyView() {
 
     useEffect(() => {
         if (id) {
-            setLoading(true);
             axiosClient.get(`/survey/${id}`)
                 .then(({ data }) => {
                     setSurvey(data.data);
+                }).catch((error) => {
+                    if (error.response && error.response.status === 404) {
+                        setNotFound(true);
+                    }
+                })
+                .finally(() => {
                     setLoading(false);
                 });
         }
     }, []);
+
+    if (notFound) {
+        return <NotFound />;
+    }
 
     return (
         <PageComponent 

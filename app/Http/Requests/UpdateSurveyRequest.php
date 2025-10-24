@@ -35,8 +35,14 @@ class UpdateSurveyRequest extends FormRequest
             'user_id' => 'exists:users,id',
             'status' => 'required|boolean',
             'description' => 'nullable|string',
-            'expire_date' => 'nullable|date|after:today',
-            'questions' => 'array'
+            'expire_date' => 'nullable|date|after_or_equal:today',
+            'questions' => 'required|array'
         ];
+    }
+
+    public function messages() {
+        return [
+            'questions.required' => 'Your survey must have at least one question.',
+        ]; 
     }
 }

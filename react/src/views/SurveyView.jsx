@@ -238,7 +238,7 @@ export default function SurveyView() {
                                 type="date"
                                 name="expire_date"
                                 id="expire_date"
-                                value={survey.expire_date}
+                                value={survey.expire_date || ""}
                                 onChange={ev => setSurvey({...survey, expire_date: ev.target.value})}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm"
                             />

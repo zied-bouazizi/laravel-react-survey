@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Enum;
+use Carbon\Carbon;
 
 class SurveyController extends Controller
 {
@@ -251,10 +252,11 @@ class SurveyController extends Controller
             return response('', 404);
         }
 
-        $currentDate = new \DateTime();
-        $expireDate = new \DateTime($survey->expire_date);
-        if ($currentDate > $expireDate) {
-            return response("", 404);
+        if ($survey->expire_date && Carbon::today()->gt(Carbon::parse($survey->expire_date))) {
+            return (new SurveyResource($survey))
+                ->additional(['expired' => true])
+                ->response()
+                ->setStatusCode(200);
         }
 
         return new SurveyResource($survey);

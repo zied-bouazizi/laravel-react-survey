@@ -12,6 +12,7 @@ export default function SurveyPublicView() {
     });
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
+    const [isExpired, setIsExpired] = useState(false);
     const [surveyFinished, setSurveyFinished] = useState(false);
     const answers = {};
 
@@ -19,6 +20,9 @@ export default function SurveyPublicView() {
         axiosClient.get(`/survey/get-by-slug/${slug}`)
         .then(({ data }) => {
             setSurvey(data.data);
+            if (data.expired) {
+                setIsExpired(true);
+            }
         })
         .catch((error) => {
           if (error.response && error.response.status === 404) {
@@ -61,18 +65,23 @@ export default function SurveyPublicView() {
 
                             <div className="col-span-5">
                             <h1 className="text-3xl mb-3">{survey.title}</h1>
-                            <p className="text-gray-500 text-sm mb-3">
-                                Expire Date: {survey.expire_date}
-                            </p>
+                            {survey.expire_date && (
+                                <p>Expire Date: {survey.expire_date}</p>
+                            )}
                             <p className="text-gray-500 text-sm mb-3">{survey.description}</p>
                             </div>
                         </div>
+                        {isExpired && (
+                            <div className="py-8 px-6 bg-red-500 text-white max-w-lg w-full mx-auto">
+                                This survey has expired and is no longer accepting responses.
+                            </div>
+                        )}
                         {surveyFinished && (
                             <div className="py-8 px-6 bg-emerald-500 text-white max-w-lg w-full mx-auto">
                                 Thank you for participating in the survey
                             </div>
                         )}
-                        {!surveyFinished && (
+                        {!surveyFinished && !isExpired && (
                             <>
                                 <div>
                                     {survey.questions.map((question, index) => (

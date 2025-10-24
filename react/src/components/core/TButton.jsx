@@ -8,6 +8,7 @@ export default function TButton({
   link = false,
   target = "_blank",
   onClick = () => {},
+  className = "",
   children,
 }) {
   let classes = [
@@ -70,6 +71,14 @@ export default function TButton({
           "focus:ring-sky-500",
         ];
         break;
+        case "gray":
+        classes = [
+          ...classes,
+          "bg-gray-600",
+          "hover:bg-gray-700",
+          "focus:ring-gray-500",
+        ];
+        break;
     }
   }
 
@@ -87,20 +96,22 @@ export default function TButton({
     classes = [...classes, "p-0", "py-2", "px-4", "rounded-md"];
   }
 
+  const finalClasses = [...classes, className].join(" ");
+
   return (
     <>
       {href && (
-        <a href={href} className={classes.join(" ")} target={target}>
+        <a href={href} className={finalClasses} target={target}>
           {children}
         </a>
       )}
       {to && (
-        <Link to={to} className={classes.join(" ")}>
+        <Link to={to} className={finalClasses}>
           {children}
         </Link>
       )}
       {!to && !href && (
-        <button onClick={onClick} className={classes.join(" ")}>{children}</button>
+        <button onClick={onClick} className={finalClasses}>{children}</button>
       )}
     </>
   );

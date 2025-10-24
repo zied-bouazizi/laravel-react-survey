@@ -6,21 +6,30 @@ import { useEffect, useState } from "react";
 import axiosClient from "../axios";
 import PaginationLinks from "../components/PaginationLinks";
 import { useStateContext } from "../contexts/ContextProvider";
+import DeleteSurveyModal from "../components/DeleteSurveyModal";
 
 export default function Surveys() {
   const { showToast } = useStateContext();
   const [surveys, setSurveys] = useState([]);
   const [loading, setLoading] = useState(false);
   const [meta, setMeta] = useState({});
+  const [surveyToDelete, setSurveyToDelete] = useState(null);
+
+  const confirmSurveyDeletion = (survey) => {
+    setSurveyToDelete(survey);
+  };
+
+  const closeModal = () => {
+    setSurveyToDelete(null);
+  };
 
   const onDeleteClick = (id) => {
-    if (window.confirm("Are you sure you want to delete this survey?")) {
-      axiosClient.delete(`/survey/${id}`)
-        .then(() => {
-          getSurveys();
-          showToast('The survey was deleted');
-        });
-    }
+    axiosClient.delete(`/survey/${id}`)
+      .then(() => {
+        getSurveys();
+        showToast('The survey was deleted');
+        closeModal();
+      });
   }
 
   const onPageClick = (link) => {
@@ -58,12 +67,17 @@ export default function Surveys() {
           }
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
             {surveys.map(survey => (
-              <SurveyListItem key={survey.id} survey={survey} onDeleteClick={onDeleteClick} />
+              <SurveyListItem key={survey.id} survey={survey} onDeleteClick={() => confirmSurveyDeletion(survey)} />
             ))}
           </div>
           {surveys.length > 0 && <PaginationLinks meta={meta} onPageClick={onPageClick} />}
         </div>
       )}
+      <DeleteSurveyModal
+        surveyToDelete={surveyToDelete}
+        closeModal={closeModal}
+        onDeleteClick={onDeleteClick}
+      />
     </PageComponent>
   )
 }

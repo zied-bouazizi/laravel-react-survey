@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useStateContext } from "../contexts/ContextProvider.jsx";
 import NotFound from "./NotFound.jsx";
 import Unauthorized from "./Unauthorized.jsx";
+import DeleteSurveyModal from "../components/DeleteSurveyModal.jsx";
 
 export default function SurveyView() {
     const { showToast } = useStateContext();
@@ -29,6 +30,7 @@ export default function SurveyView() {
     const [notFound, setNotFound] = useState(false);
     const [unauthorized, setUnauthorized] = useState(false);
     const [errors, setErrors] = useState("");
+    const [surveyToDelete, setSurveyToDelete] = useState(null);
 
     const onImageChoose = (ev) => {
         const file = ev.target.files[0];
@@ -93,14 +95,21 @@ export default function SurveyView() {
         setSurvey({ ...survey });
     };
 
-    const onDelete = (id) => {
-        if (window.confirm("Are you sure you want to delete this survey?")) {
+    const confirmSurveyDeletion = (survey) => {
+        setSurveyToDelete(survey);
+    };
+
+    const closeModal = () => {
+        setSurveyToDelete(null);
+    };
+
+    const onDeleteClick = (id) => {
         axiosClient.delete(`/survey/${id}`)
             .then(() => {
             navigate('/surveys');
             showToast('The survey was deleted');
+            closeModal();
             });
-        }
     }
 
     useEffect(() => {
@@ -141,7 +150,7 @@ export default function SurveyView() {
                                 <LinkIcon className="h-4 w-4 mr-2" />
                                 Public Link
                             </TButton>}
-                            <TButton color="red" onClick={ev => onDelete(survey.id)}>
+                            <TButton color="red" onClick={() => confirmSurveyDeletion(survey)}>
                                 <TrashIcon className="h-4 w-4 mr-2" />
                                 Delete
                             </TButton>
@@ -275,6 +284,11 @@ export default function SurveyView() {
                     </div>
                 </form>
             }
+            <DeleteSurveyModal
+                surveyToDelete={surveyToDelete}
+                closeModal={closeModal}
+                onDeleteClick={onDeleteClick}
+            />
         </PageComponent>
     )
 }

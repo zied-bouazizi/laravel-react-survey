@@ -1,10 +1,11 @@
 import { Fragment, useEffect } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Navigate, NavLink, Outlet } from "react-router-dom";
+import { Link, Navigate, NavLink, Outlet } from "react-router-dom";
 import { useStateContext } from '../contexts/ContextProvider';
 import axiosClient from '../axios';
 import Toast from './Toast';
+import ApplicationLogo from './ApplicationLogo';
 
 const navigation = [
   { name: 'Dashboard', to: '/' },
@@ -49,11 +50,9 @@ export default function DefaultLayout() {
                 <div className="flex h-16 items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <img
-                        className="h-8 w-8"
-                        src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-                        alt="Your Company"
-                      />
+                      <Link to="/">
+                        <ApplicationLogo className="h-8 w-8" />
+                    </Link>
                     </div>
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
@@ -94,6 +93,15 @@ export default function DefaultLayout() {
                           leaveTo="transform opacity-0 scale-95"
                         >
                           <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                             <div className="px-4 py-3 border-b border-gray-200">
+                              <div className="flex items-center">
+                                <UserIcon className="w-8 h-8 bg-black p-2 rounded-full text-white" />
+                                <div className="ml-3">
+                                  <p className="text-sm font-medium text-gray-900">{currentUser.name}</p>
+                                  <p className="text-xs text-gray-500">{currentUser.email}</p>
+                                </div>
+                              </div>
+                            </div>
                             <Menu.Item>
                               <a
                                 href="#"
@@ -123,41 +131,46 @@ export default function DefaultLayout() {
               </div>
 
               <Disclosure.Panel className="md:hidden">
-                <div className="space-y-1 px-2 pt-2 pb-3 sm:px-3">
-                  {navigation.map((item) => (
-                    <NavLink
-                      key={item.name}
-                      to={item.to}
-                      className={( { isActive }) => classNames(
-                        isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                        'block px-3 py-2 rounded-md text-base font-medium'
-                      )}
-                    >
-                      {item.name}
-                    </NavLink>
-                  ))}
-                </div>
-                <div className="border-t border-gray-700 pt-4 pb-3">
-                  <div className="flex items-center px-5">
-                    <div className="flex-shrink-0">
-                      <UserIcon className="w-8 h-8 bg-black/25 p-2 rounded-full text-white" />
+                {({ close }) => (
+                  <>
+                    <div className="space-y-1 px-2 pt-2 pb-3 sm:px-3">
+                      {navigation.map((item) => (
+                        <NavLink
+                          key={item.name}
+                          to={item.to}
+                          className={({ isActive }) => classNames(
+                              isActive ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                              'block px-3 py-2 rounded-md text-base font-medium'
+                            )}
+                          onClick={() => close()} 
+                        >
+                          {item.name}
+                        </NavLink>
+                      ))}
                     </div>
-                    <div className="ml-3">
-                      <div className="text-base font-medium leading-none text-white">{currentUser.name}</div>
-                      <div className="text-sm font-medium leading-none text-gray-400">{currentUser.email}</div>
+                    <div className="border-t border-gray-700 pt-4 pb-3">
+                      <div className="flex items-center px-5">
+                        <div className="flex-shrink-0">
+                          <UserIcon className="w-8 h-8 bg-black/25 p-2 rounded-full text-white" />
+                        </div>
+                        <div className="ml-3">
+                          <div className="text-base font-medium leading-none text-white">{currentUser.name}</div>
+                          <div className="text-sm font-medium leading-none text-gray-400">{currentUser.email}</div>
+                        </div>
+                      </div>
+                      <div className="mt-3 space-y-1 px-2">
+                        <Disclosure.Button
+                          as="a"
+                          href="#"
+                          onClick={(ev) => logout(ev)}
+                          className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
+                        >
+                          Sign out
+                        </Disclosure.Button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-3 space-y-1 px-2">
-                    <Disclosure.Button
-                      as="a"
-                      href="#"
-                      onClick={(ev) => logout(ev)}
-                      className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
-                    >
-                      Sign out
-                    </Disclosure.Button>
-                  </div>
-                </div>
+                  </>
+                )}
               </Disclosure.Panel>
             </>
           )}

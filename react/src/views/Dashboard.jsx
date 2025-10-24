@@ -81,12 +81,12 @@ export default function Dashboard() {
                   <div>{data.latestSurvey.answers}</div>
                 </div>
                 <div className="flex justify-between">
-                  <TButton to={`/surveys/${data.latestSurvey.id}`} link>
+                  <TButton color="sky" to={`/surveys/${data.latestSurvey.id}`} link>
                     <PencilIcon className="w-5 h-5 mr-2" />
                     Edit Survey
                   </TButton>
 
-                  <TButton link>
+                  <TButton color="sky" link>
                     <EyeIcon className="w-5 h-5 mr-2" />
                     View Answers
                   </TButton>
@@ -104,20 +104,20 @@ export default function Dashboard() {
             className="order-4 lg:order-3 row-span-2"
             style={{ animationDelay: '0.3s' }}
           >
-            {data.latestAnswers.length && (
+            {data.latestAnswers.length > 0 && (
               <div className="text-left">
                 {data.latestAnswers.map((answer) => (
-                  <a
-                    href="#"
+                  <button
                     key={answer.id}
-                    className="block p-2 hover:bg-gray-100/90"
+                    type="button"
+                    className="block w-full text-left p-2 hover:bg-gray-100/90"
                   >
                     <div className="font-semibold">{answer.survey.title}</div>
                     <small>
-                      Answer Made at:
+                      Answer made at:
                       <i className="font-semibold"> {answer.end_date}</i>
                     </small>
-                  </a>
+                  </button>
                 ))}
               </div>
             )}

@@ -43,9 +43,9 @@ export default function Surveys() {
 
   return (
     <PageComponent title='Surveys'
-                   buttons={(<TButton color="green" to="/surveys/create">
+                   buttons={(<TButton color="sky" to="/surveys/create">
                      <PlusCircleIcon className="w-6 h-6 mr-2" />
-                     Create new
+                     Create Survey
                    </TButton>)}>
       
       {loading && <div className="text-center text-lg">loading...</div>}

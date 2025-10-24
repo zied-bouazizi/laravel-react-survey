@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom'
 import { useStateContext } from '../contexts/ContextProvider';
 import axiosClient from '../axios';
+import Head from '../components/Head';
 
 export default function Login() {
     const { setCurrentUser, setUserToken } = useStateContext();
@@ -34,12 +35,14 @@ export default function Login() {
 
     return (
         <>
+            <Head title="Login" />
+
             <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
                 Sign in to your account
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
                 Or{' '}
-                <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
+                <Link to="/signup" className="font-medium text-sky-600 hover:text-sky-500">
                 signup for free
                 </Link>
             </p>
@@ -56,7 +59,7 @@ export default function Login() {
                 <div className="-space-y-px rounded-md shadow-sm">
                 <div>
                     <label htmlFor="email-address" className="sr-only">
-                    Email address
+                    Email Address
                     </label>
                     <input
                     id="email-address"
@@ -66,8 +69,8 @@ export default function Login() {
                     required
                     value={email}
                     onChange={ev => setEmail(ev.target.value)}
-                    className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                    placeholder="Email address"
+                    className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                    placeholder="Email Address"
                     />
                 </div>
                 <div>
@@ -82,7 +85,7 @@ export default function Login() {
                     required
                     value={password}
                     onChange={ev => setPassword(ev.target.value)}
-                    className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
                     placeholder="Password"
                     />
                 </div>
@@ -94,7 +97,7 @@ export default function Login() {
                         id="remember-me"
                         name="remember-me"
                         type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
                         />
                         <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
                         Remember me
@@ -105,10 +108,10 @@ export default function Login() {
                 <div>
                 <button
                     type="submit"
-                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-sky-600 py-2 px-4 text-sm font-medium text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
                 >
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <LockClosedIcon className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" aria-hidden="true" />
+                    <LockClosedIcon className="h-5 w-5 text-sky-500 group-hover:text-sky-400" aria-hidden="true" />
                     </span>
                     Sign in
                 </button>

@@ -25,7 +25,7 @@ export default function PublicQuestionView({ question, index, answerChanged }) {
                 <div>
                 <select
                     onChange={ev => answerChanged(ev.target.value)}
-                    className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                 >
                     <option value="">Please Select</option>
                     {question.data.options.map((option) => (
@@ -46,7 +46,7 @@ export default function PublicQuestionView({ question, index, answerChanged }) {
                         value={option.text}
                         type="radio"
                         onChange={ev => answerChanged(ev.target.value)}
-                        className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
+                        className="focus:ring-sky-500 h-4 w-4 text-sky-600 border-gray-300"
                     />
                     <label
                         htmlFor={option.uuid}
@@ -66,7 +66,7 @@ export default function PublicQuestionView({ question, index, answerChanged }) {
                         id={option.uuid}
                         type="checkbox"
                         onChange={ev => onCheckboxChange(option, ev)}
-                        className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                        className="focus:ring-sky-500 h-4 w-4 text-sky-600 border-gray-300 rounded"
                     />
                     <label
                         htmlFor={option.uuid}
@@ -83,7 +83,7 @@ export default function PublicQuestionView({ question, index, answerChanged }) {
                 <input
                     type="text"
                     onChange={ev => answerChanged(ev.target.value)}
-                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                    className="mt-1 focus:ring-sky-500 focus:border-sky-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                 />
                 </div>
             )}
@@ -91,7 +91,7 @@ export default function PublicQuestionView({ question, index, answerChanged }) {
                 <div>
                 <textarea
                     onChange={ev => answerChanged(ev.target.value)}
-                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                    className="mt-1 focus:ring-sky-500 focus:border-sky-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                 ></textarea>
                 </div>
             )}

@@ -44,7 +44,7 @@ export default function SurveyQuestions({questions, onQuestionsUpdate}) {
   
   return (
      <>
-      <div className="flex justify-between">
+      <div className="flex justify-between py-2">
         <h3 className="text-2xl font-bold">Questions</h3>
         <button
           type="button"
@@ -52,7 +52,7 @@ export default function SurveyQuestions({questions, onQuestionsUpdate}) {
           onClick={() => addQuestion()}
         >
           <PlusIcon className="w-4 mr-2"/>
-          Add question
+          Add Question
         </button>
       </div>
       {myQuestions.length ? (

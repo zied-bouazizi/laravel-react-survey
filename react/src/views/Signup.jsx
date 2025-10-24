@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom'
 import axiosClient from '../axios';
 import { useStateContext } from '../contexts/ContextProvider';
+import Head from '../components/Head';
 
 export default function Signup() {
     const { setCurrentUser, setUserToken } = useStateContext();
@@ -37,12 +38,14 @@ export default function Signup() {
 
     return (
         <>
+            <Head title="Signup" />
+
             <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
                 Signup for free
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
                 Or{' '}
-                <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+                <Link to="/login" className="font-medium text-sky-600 hover:text-sky-500">
                 Login with your account
                 </Link>
             </p>
@@ -64,13 +67,13 @@ export default function Signup() {
                         required
                         value={fullName}
                         onChange={ev => setFullName(ev.target.value)}
-                        className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                        className="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
                         placeholder="Full Name"
                         />
                     </div>
                 <div>
                     <label htmlFor="email-address" className="sr-only">
-                    Email address
+                    Email Address
                     </label>
                     <input
                     id="email-address"
@@ -80,8 +83,8 @@ export default function Signup() {
                     required
                     value={email}
                     onChange={ev => setEmail(ev.target.value)}
-                    className="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                    placeholder="Email address"
+                    className="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                    placeholder="Email Address"
                     />
                 </div>
                 <div>
@@ -96,7 +99,7 @@ export default function Signup() {
                     required
                     value={password}
                     onChange={ev => setPassword(ev.target.value)}
-                    className="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    className="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
                     placeholder="Password"
                     />
                 </div>
@@ -111,7 +114,7 @@ export default function Signup() {
                     required
                     value={passwordConfirmation}
                     onChange={ev => setPasswordConfirmation(ev.target.value)}
-                    className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    className="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
                     placeholder="Password Confirmation"
                     />
                 </div>
@@ -120,10 +123,10 @@ export default function Signup() {
                 <div>
                 <button
                     type="submit"
-                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    className="group relative flex w-full justify-center rounded-md border border-transparent bg-sky-600 py-2 px-4 text-sm font-medium text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
                 >
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <LockClosedIcon className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" aria-hidden="true" />
+                    <LockClosedIcon className="h-5 w-5 text-sky-500 group-hover:text-sky-400" aria-hidden="true" />
                     </span>
                     Signup
                 </button>

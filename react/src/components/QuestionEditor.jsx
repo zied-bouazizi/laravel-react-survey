@@ -57,7 +57,7 @@ export default function QuestionEditor({
 
   return (
     <>
-      <div>
+      <div className="py-2">
         <div className="flex justify-between mb-3">
           <h4>
             {index + 1}. {model.question}
@@ -78,8 +78,8 @@ export default function QuestionEditor({
             hover:bg-gray-700"
               onClick={() => addQuestion(index + 1)}
             >
-              <PlusIcon className="w-4" />
-              add
+              <PlusIcon className="w-4 mr-1" />
+              Add
             </button>
             <button
               type="button"
@@ -91,13 +91,13 @@ export default function QuestionEditor({
             px-3
             rounded-sm
             border border-transparent
-            text-red-500
+            text-red-600
             hover:border-red-600
             font-semibold
           "
               onClick={() => deleteQuestion(question)}
             >
-              <TrashIcon className="w-4" />
+              <TrashIcon className="w-4 mr-1" />
               Delete
             </button>
           </div>
@@ -119,7 +119,8 @@ export default function QuestionEditor({
               onChange={(ev) =>
                 setModel({ ...model, question: ev.target.value })
               }
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm"
+              required
             />
           </div>
           {/* Question Text */}
@@ -137,7 +138,7 @@ export default function QuestionEditor({
               name="questionType"
               value={model.type}
               onChange={onTypeChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
             >
               {questionTypes.map((type) => (
                 <option value={type} key={type}>
@@ -164,7 +165,7 @@ export default function QuestionEditor({
             onChange={(ev) =>
               setModel({ ...model, description: ev.target.value })
             }
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm"
           ></textarea>
         </div>
         {/*Description*/}
@@ -214,7 +215,7 @@ export default function QuestionEditor({
                       px-2
                       text-xs
                       border border-gray-300
-                      focus:border-indigo-500"
+                      focus:border-sky-500"
                       />
                       <button
                         onClick={ev => deleteOption(op)}
@@ -229,7 +230,7 @@ export default function QuestionEditor({
                         transition-colors
                         hover:border-red-100"
                       >
-                        <TrashIcon className="w-3 h-3 text-red-500" />
+                        <TrashIcon className="w-3 h-3 text-red-600" />
                       </button>
                     </div>
                   ))}

@@ -5,8 +5,7 @@ export default function SurveyListItem({ survey, onDeleteClick }) {
   return (
     <div className="flex flex-col py-4 px-6 shadow-md bg-white hover:bg-gray-50 h-[470px]">
         <img
-            src={survey.image_url ||
-            'https://st3.depositphotos.com/23594922/31822/v/600/depositphotos_318221368-stock-illustration-missing-picture-page-for-website.jpg'}
+            src={survey.image_url}
             alt={survey.title}
             className="w-full h-56 object-cover"
         />

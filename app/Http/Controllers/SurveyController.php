@@ -14,6 +14,7 @@ use App\Models\SurveyQuestionAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Enum;
@@ -29,7 +30,7 @@ class SurveyController extends Controller
     {
         $user = $request->user();
 
-        return SurveyResource::collection(Survey::where('user_id', $user->id)->orderBy('created_at', 'desc')->paginate(2));
+        return SurveyResource::collection(Survey::where('user_id', $user->id)->orderBy('created_at', 'desc')->paginate(3));
     }
 
     /**
@@ -93,8 +94,8 @@ class SurveyController extends Controller
 
             // If there is an old image, delete it
             if ($survey->image) {
-                $absolutePath = public_path($survey->image);
-                File::delete($absolutePath);
+                $path = str_replace('storage/', '', $survey->image); 
+                Storage::disk('public')->delete($path);
             }
         }
 
@@ -146,13 +147,13 @@ class SurveyController extends Controller
             return abort(403, 'Unauthorized action.');
         }
 
-        $survey->delete();
-
         // If there is an old image, delete it
         if ($survey->image) {
-            $absolutePath = public_path($survey->image);
-            File::delete($absolutePath);
+            $path = str_replace('storage/', '', $survey->image); 
+            Storage::disk('public')->delete($path);
         }
+
+        $survey->delete();
 
         return response('', 204);
     }
@@ -186,16 +187,11 @@ class SurveyController extends Controller
             throw new \Exception('did not match data URI with image data');
         }
 
-        $dir = 'images/';
         $file = Str::random() . '.' . $type;
-        $absolutePath = public_path($dir);
-        $relativePath = $dir . $file;
-        if (!File::exists($absolutePath)) {
-            File::makeDirectory($absolutePath, 0755, true);
-        }
-        file_put_contents($relativePath, $image);
 
-        return $relativePath;
+        Storage::disk('public')->put("images/{$file}", $image);
+
+        return "storage/images/{$file}";
     }
 
     /**

@@ -8,6 +8,7 @@ import TButton from "../components/core/TButton.jsx";
 import { v4 as uuidv4 } from "uuid";
 import { useStateContext } from "../contexts/ContextProvider.jsx";
 import NotFound from "./NotFound.jsx";
+import Unauthorized from "./Unauthorized.jsx";
 
 export default function SurveyView() {
     const { showToast } = useStateContext();
@@ -26,6 +27,7 @@ export default function SurveyView() {
     const [savedStatus, setSavedStatus] = useState(false);
     const [loading, setLoading] = useState(false);
     const [notFound, setNotFound] = useState(false);
+    const [unauthorized, setUnauthorized] = useState(false);
     const [errors, setErrors] = useState("");
 
     const onImageChoose = (ev) => {
@@ -111,6 +113,8 @@ export default function SurveyView() {
                 }).catch((error) => {
                     if (error.response && error.response.status === 404) {
                         setNotFound(true);
+                    } else if (error.response && error.response.status === 403) {
+                        setUnauthorized(true);
                     }
                 })
                 .finally(() => {
@@ -121,6 +125,10 @@ export default function SurveyView() {
 
     if (notFound) {
         return <NotFound />;
+    }
+
+    if (unauthorized) {
+        return <Unauthorized />;
     }
 
     return (

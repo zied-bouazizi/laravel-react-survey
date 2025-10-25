@@ -21,7 +21,9 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->longText('data')->nullable();
             $table->boolean('is_required')->default(false);
-            $table->foreignIdFor(Survey::class, 'survey_id');
+            $table->foreignIdFor(Survey::class, 'survey_id')
+                ->constrained()
+                ->cascadeOnDelete();
             $table->timestamps();
         });
     }

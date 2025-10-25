@@ -1,21 +1,21 @@
-export default function PublicQuestionView({ question, index, answerChanged }) {
-    let selectedOptions = [];
-
+export default function PublicQuestionView({ question, index, value, answerChanged, error }) {
     function onCheckboxChange(option, event) {
-        if (event.target.checked) {
-        selectedOptions.push(option.text);
-        } else {
-        selectedOptions = selectedOptions.filter(op => op != option.text);
-        }
-        answerChanged(selectedOptions);
-    };
+        const current = Array.isArray(value) ? value : [];
+
+        const updated = event.target.checked
+            ? [...current, option.text]
+            : current.filter(op => op !== option.text);
+
+        answerChanged(updated);
+    }
 
     return (
         <>
         <fieldset className="mb-4">
             <div>
             <legend className="text-base font-medium text-gray-900">
-                {index + 1}. {question.question}
+                {index + 1}. {question.question}{" "}
+                {Boolean(question.is_required) && <span className="text-red-600">*</span>}
             </legend>
             <p className="text-gray-500 text-sm">{question.description}</p>
             </div>
@@ -24,6 +24,7 @@ export default function PublicQuestionView({ question, index, answerChanged }) {
             {question.type === "select" && (
                 <div>
                 <select
+                    value={value}
                     onChange={ev => answerChanged(ev.target.value)}
                     className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                 >
@@ -43,7 +44,8 @@ export default function PublicQuestionView({ question, index, answerChanged }) {
                     <input
                         id={option.uuid}
                         name={"question" + question.id}
-                        value={option.text}
+                        value={option.text}  
+                        checked={value === option.text}
                         type="radio"
                         onChange={ev => answerChanged(ev.target.value)}
                         className="focus:ring-sky-500 h-4 w-4 text-sky-600 border-gray-300"
@@ -65,6 +67,7 @@ export default function PublicQuestionView({ question, index, answerChanged }) {
                     <input
                         id={option.uuid}
                         type="checkbox"
+                        checked={value.includes(option.text)}
                         onChange={ev => onCheckboxChange(option, ev)}
                         className="focus:ring-sky-500 h-4 w-4 text-sky-600 border-gray-300 rounded"
                     />
@@ -82,6 +85,7 @@ export default function PublicQuestionView({ question, index, answerChanged }) {
                 <div>
                 <input
                     type="text"
+                    value={value}
                     onChange={ev => answerChanged(ev.target.value)}
                     className="mt-1 focus:ring-sky-500 focus:border-sky-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                 />
@@ -90,11 +94,13 @@ export default function PublicQuestionView({ question, index, answerChanged }) {
             {question.type === "textarea" && (
                 <div>
                 <textarea
+                    value={value}
                     onChange={ev => answerChanged(ev.target.value)}
                     className="mt-1 focus:ring-sky-500 focus:border-sky-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
                 ></textarea>
                 </div>
             )}
+            {error && <p className="text-red-600 text-sm mt-1">{error}</p>}
             </div>
         </fieldset>
         <hr className="mb-4" />

@@ -14,6 +14,7 @@ export default function SurveyQuestions({questions, onQuestionsUpdate}) {
       question: "",
       description: "",
       data: {},
+      is_required: false,
     })
     setMyQuestions([...myQuestions]);
     onQuestionsUpdate(myQuestions)

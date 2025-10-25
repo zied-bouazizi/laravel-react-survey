@@ -216,6 +216,7 @@ class SurveyController extends Controller
             ],
             'description' => 'nullable|string',
             'data' => 'present',
+            'is_required' => 'boolean',
             'survey_id' => 'exists:App\Models\Survey,id'
         ]);
 
@@ -241,6 +242,7 @@ class SurveyController extends Controller
             'type' => ['required', new Enum(QuestionTypeEnum::class)],
             'description' => 'nullable|string',
             'data' => 'present',
+            'is_required' => 'boolean',
         ]);
 
         return $question->update($validator->validated());
@@ -264,27 +266,24 @@ class SurveyController extends Controller
 
     public function storeAnswer(StoreSurveyAnswerRequest $request, Survey $survey)
     {
-        $validated = $request->validated();
-
         $surveyAnswer = SurveyAnswer::create([
             'survey_id' => $survey->id,
             'start_date' => date('Y-m-d H:i:s'),
             'end_date' => date('Y-m-d H:i:s'),
         ]);
 
-        foreach ($validated['answers'] as $questionId => $answer) {
-            $question = SurveyQuestion::where(['id' => $questionId, 'survey_id' => $survey->id])->get();
-            if (!$question) {
-                return response("Invalid question ID: \"$questionId\"", 400);
-            }
+        $answers = $request->input('answers', []);
 
-            $data = [
+        foreach ($answers as $questionId => $answer) {
+            if ($answer !== null && !(is_string($answer) && trim($answer) === '') && !(is_array($answer) && count($answer) === 0)) { 
+                $data = [
                 'survey_question_id' => $questionId,
                 'survey_answer_id' => $surveyAnswer->id,
                 'answer' => is_array($answer) ? json_encode($answer) : $answer
             ];
 
             SurveyQuestionAnswer::create($data);
+            }
         }
 
         return response("", 201);

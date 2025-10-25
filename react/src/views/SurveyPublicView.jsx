@@ -14,7 +14,8 @@ export default function SurveyPublicView() {
     const [notFound, setNotFound] = useState(false);
     const [isExpired, setIsExpired] = useState(false);
     const [surveyFinished, setSurveyFinished] = useState(false);
-    const answers = {};
+    const [answers, setAnswers] = useState({}); 
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         axiosClient.get(`/survey/get-by-slug/${slug}`)
@@ -39,7 +40,10 @@ export default function SurveyPublicView() {
     }
 
     function answerChanged(question, value) {
-        answers[question.id] = value;
+        setAnswers(prev => ({
+            ...prev,
+            [question.id]: value
+        }));
     }
 
     function onSubmit(ev) {
@@ -48,6 +52,12 @@ export default function SurveyPublicView() {
         axiosClient.post(`/survey/${survey.id}/answer`, { answers })
             .then(() => {
                 setSurveyFinished(true);
+                setErrors({});
+            })
+            .catch((error) => {
+                if (error.response && error.response.status === 422) {
+                    setErrors(error.response.data.errors || {});
+                }
             });
     }
 
@@ -89,7 +99,9 @@ export default function SurveyPublicView() {
                                             key={question.id} 
                                             question={question} 
                                             index={index} 
+                                            value={answers[question.id] ?? (question.type === 'checkbox' ? [] : '')}
                                             answerChanged={(val) => answerChanged(question, val)} 
+                                            error={errors['answers.' + question.id]?.[0]}
                                         />
                                     ))}
                                 </div>

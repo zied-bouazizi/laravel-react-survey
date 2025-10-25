@@ -19,7 +19,8 @@ class SurveyQuestionResource extends JsonResource
             'type' => $this->type,
             'question' => $this->question,
             'description' => $this->description,
-            'data' => json_decode($this->data)
+            'data' => json_decode($this->data),
+            'is_required' => $this->is_required,
         ];
     }
 }

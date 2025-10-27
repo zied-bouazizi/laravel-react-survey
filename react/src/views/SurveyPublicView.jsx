@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import PublicQuestionView from "../components/PublicQuestionView";
 import NotFound from "./NotFound";
 import Head from "../components/Head";
+import { v4 as uuidv4 } from "uuid";
 
 export default function SurveyPublicView() {
     const { slug } = useParams();
@@ -20,7 +21,20 @@ export default function SurveyPublicView() {
     useEffect(() => {
         axiosClient.get(`/survey/get-by-slug/${slug}`)
         .then(({ data }) => {
-            setSurvey(data.data);
+            setSurvey({
+                ...data.data,
+                questions: data.data.questions.map(q => ({
+                    ...q,
+                    data: ["select", "radio", "checkbox"].includes(q.type)
+                        ? {
+                            options: (q.data?.options ?? []).map(op => ({
+                                ...op,
+                                _uuid: uuidv4(),
+                            })),
+                            }
+                        : {},
+                })),
+            });
             if (data.expired) {
                 setIsExpired(true);
             }
@@ -33,7 +47,7 @@ export default function SurveyPublicView() {
       .finally(() => {
         setLoading(false);
       });
-    }, []);
+    }, [slug]);
 
     if (notFound) {
      return <NotFound />;

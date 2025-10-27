@@ -1,47 +1,33 @@
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import QuestionEditor from "./QuestionEditor";
 
-export default function SurveyQuestions({questions, onQuestionsUpdate}) {
-  const [myQuestions, setMyQuestions] = useState([...questions]);
-
+export default function SurveyQuestions({questions, errors, onQuestionsUpdate}) {
   const addQuestion = (index) => {
-    index = index !== undefined ? index : myQuestions.length
-    myQuestions.splice(index, 0, {
-      id: uuidv4(),
+    const newQuestion = {
+      _uuid: uuidv4(),
       type: "text",
       question: "",
       description: "",
       data: {},
       is_required: false,
-    })
-    setMyQuestions([...myQuestions]);
-    onQuestionsUpdate(myQuestions)
+    };
+
+    const newQuestions = [...questions];
+    newQuestions.splice(index ?? questions.length, 0, newQuestion);
+
+    onQuestionsUpdate(newQuestions);
   };
 
-  const questionChange = (question) => {
-    if (!question) return;
-    const newQuestions = myQuestions.map((q) => {
-      if (q.id == question.id) {
-        return {...question};
-      }
-      return q;
-    });
-    setMyQuestions(newQuestions);
-    onQuestionsUpdate(newQuestions)
+  const questionChange = (index, updatedQuestion) => {
+    const newQuestions = [...questions];
+    newQuestions[index] = updatedQuestion;
+    onQuestionsUpdate(newQuestions);
   };
 
-  const deleteQuestion = (question) => {
-    const newQuestions = myQuestions.filter((q) => q.id !== question.id);
-
-    setMyQuestions(newQuestions);
-    onQuestionsUpdate(newQuestions)
+  const deleteQuestion = (index) => {
+    onQuestionsUpdate(questions.filter((_, i) => i !== index));
   };
-
-  useEffect(() => {
-    setMyQuestions(questions)
-  }, [questions]);
   
   return (
      <>
@@ -56,12 +42,13 @@ export default function SurveyQuestions({questions, onQuestionsUpdate}) {
           Add Question
         </button>
       </div>
-      {myQuestions.length ? (
-        myQuestions.map((q, ind) => (
+      {questions.length ? (
+        questions.map((q, ind) => (
           <QuestionEditor
-            key={q.id}
+            key={q._uuid}
             index={ind}
             question={q}
+            errors={errors}
             questionChange={questionChange}
             addQuestion={addQuestion}
             deleteQuestion={deleteQuestion}

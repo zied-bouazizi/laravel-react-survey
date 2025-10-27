@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\QuestionTypeEnum;
 use App\Http\Requests\StoreSurveyAnswerRequest;
 use App\Models\Survey;
 use App\Http\Requests\StoreSurveyRequest;
@@ -12,12 +11,8 @@ use App\Models\SurveyAnswer;
 use App\Models\SurveyQuestion;
 use App\Models\SurveyQuestionAnswer;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Enum;
 use Carbon\Carbon;
 
 class SurveyController extends Controller
@@ -44,6 +39,8 @@ class SurveyController extends Controller
     {
         $data = $request->validated();
 
+        $data['user_id'] = $request->user()->id;
+
         // Check if image was given and save on local file system
         if (isset($data['image'])) {
             $relativePath = $this->saveImage($data['image']);
@@ -55,7 +52,10 @@ class SurveyController extends Controller
         // Create new questions
         foreach ($data['questions'] as $question) {
             $question['survey_id'] = $survey->id;
-            $this->createQuestion($question);
+
+            $question['data'] = json_encode($question['data'] ?? []);
+
+            SurveyQuestion::create($question);
         }
 
         return new SurveyResource($survey);
@@ -106,7 +106,10 @@ class SurveyController extends Controller
         // Get ids as plain array of existing questions
         $existingIds = $survey->questions()->pluck('id')->toArray();
         // Get ids as plain array of new questions
-        $newIds = Arr::pluck($data['questions'], 'id');
+        $newIds = collect($data['questions'])
+            ->pluck('id')
+            ->filter()
+            ->toArray();
         // Find questions to delete
         $toDelete = array_diff($existingIds, $newIds);
         //Find questions to add
@@ -117,17 +120,23 @@ class SurveyController extends Controller
 
         // Create new questions
         foreach ($data['questions'] as $question) {
-            if (in_array($question['id'], $toAdd)) {
+           if (!isset($question['id'])) {
                 $question['survey_id'] = $survey->id;
-                $this->createQuestion($question);
+                $question['data'] = json_encode($question['data'] ?? []);
+                SurveyQuestion::create($question);
             }
         }
 
         // Update existing questions
-        $questionMap = collect($data['questions'])->keyBy('id');
+        $questionMap = collect($data['questions'])
+            ->filter(fn ($q) => isset($q['id']))
+            ->keyBy('id');
+
         foreach ($survey->questions as $question) {
             if (isset($questionMap[$question->id])) {
-                $this->updateQuestion($question, $questionMap[$question->id]);
+                $updatedQuestionData = $questionMap[$question->id];
+                $updatedQuestionData['data'] = json_encode($updatedQuestionData['data'] ?? []);
+                $question->update($updatedQuestionData);
             }
         }
 
@@ -193,59 +202,6 @@ class SurveyController extends Controller
         Storage::disk('public')->put("images/{$file}", $image);
 
         return "storage/images/{$file}";
-    }
-
-    /**
-     * Create a question and return
-     *
-     * @param $data
-     * @return mixed
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    private function createQuestion($data)
-    {
-        if (is_array($data['data'])) {
-            $data['data'] = json_encode($data['data']);
-        }
-
-        $validator = Validator::make($data, [
-            'question' => 'required|string',
-            'type' => [
-                'required',
-                new Enum(QuestionTypeEnum::class)
-            ],
-            'description' => 'nullable|string',
-            'data' => 'present',
-            'is_required' => 'boolean',
-            'survey_id' => 'exists:App\Models\Survey,id'
-        ]);
-
-        return SurveyQuestion::create($validator->validated());
-    }
-
-    /**
-     * Update a question and return true or false
-     *
-     * @param \App\Models\SurveyQuestion $question
-     * @param                            $data
-     * @return bool
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    private function updateQuestion(SurveyQuestion $question, $data)
-    {
-        if (is_array($data['data'])) {
-            $data['data'] = json_encode($data['data']);
-        }
-        $validator = Validator::make($data, [
-            'id' => 'exists:App\Models\SurveyQuestion,id',
-            'question' => 'required|string',
-            'type' => ['required', new Enum(QuestionTypeEnum::class)],
-            'description' => 'nullable|string',
-            'data' => 'present',
-            'is_required' => 'boolean',
-        ]);
-
-        return $question->update($validator->validated());
     }
 
     public function getBySlug(Survey $survey)

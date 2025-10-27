@@ -29,7 +29,8 @@ export default function SurveyView() {
     const [loading, setLoading] = useState(false);
     const [notFound, setNotFound] = useState(false);
     const [unauthorized, setUnauthorized] = useState(false);
-    const [errors, setErrors] = useState("");
+    const [formErrors, setFormErrors] = useState({});
+    const [questionErrors, setQuestionErrors] = useState({});
     const [surveyToDelete, setSurveyToDelete] = useState(null);
 
     const onImageChoose = (ev) => {
@@ -51,7 +52,14 @@ export default function SurveyView() {
     const onSubmit = (ev) => {
         ev.preventDefault();
 
-        const payload = {...survey};
+        const payload = {
+            ...survey,
+            questions: survey.questions.map(q => {
+                const { _uuid, ...rest } = q;
+                return rest;
+            }),
+        };
+
         if (payload.image) {
             payload.image = payload.image_url;
         }
@@ -73,9 +81,41 @@ export default function SurveyView() {
                 }
             })
             .catch((err) => {
-                if (err && err.response) {
-                setErrors(err.response.data.errors);
-                window.scrollTo({ top: 0, behavior: "smooth" });
+                if (err?.response?.data?.errors) {
+                    const rawErrors = err.response.data.errors;
+                    const qErrors = {};
+                    const fErrors = {};
+
+                    Object.keys(rawErrors).forEach((key) => {
+                        const parts = key.split('.');
+
+                        if (key === 'questions') {
+                            fErrors.questions = rawErrors[key][0];
+                            return;
+                        }
+
+                        if (parts[0] === 'questions' && parts.length > 1) {
+                            const questionIndex = parseInt(parts[1], 10);
+                            const field = parts.slice(2).join('.');
+
+                            if (!qErrors[questionIndex]) qErrors[questionIndex] = {};
+                            qErrors[questionIndex][field || '_general'] = rawErrors[key][0];
+                            return;
+                        }
+
+                        fErrors[key] = rawErrors[key][0];
+                    });
+
+                    setQuestionErrors(qErrors);
+                    setFormErrors(fErrors);
+
+                    if (Object.keys(fErrors).length > 0) {
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                    } else if (Object.keys(qErrors).length > 0) {
+                        const firstErrorIndex = Math.min(...Object.keys(qErrors).map(k => parseInt(k, 10)));
+                        const el = document.getElementById(`question-${firstErrorIndex}`);
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
                 }
             });
     }
@@ -85,14 +125,20 @@ export default function SurveyView() {
     }
 
     const addQuestion = () => {
-        survey.questions.push({
-        id: uuidv4(),
-        type: "text",
-        question: "",
-        description: "",
-        data: {},
-        });
-        setSurvey({ ...survey });
+        setSurvey(prev => ({
+            ...prev,
+            questions: [
+                ...prev.questions,
+                {
+                    _uuid: uuidv4(),
+                    type: "text",
+                    question: "",
+                    description: "",
+                    data: {},
+                    is_required: false,
+                }
+            ]
+        }));
     };
 
     const confirmSurveyDeletion = (survey) => {
@@ -117,7 +163,21 @@ export default function SurveyView() {
             setLoading(true);
             axiosClient.get(`/survey/${id}`)
                 .then(({ data }) => {
-                    setSurvey(data.data);
+                    setSurvey({
+                        ...data.data,
+                        questions: data.data.questions.map(q => ({
+                            ...q,
+                            _uuid: uuidv4(),
+                            data: ["select", "radio", "checkbox"].includes(q.type)
+                                ? {
+                                    options: (q.data?.options ?? []).map(op => ({
+                                        ...op,
+                                        _uuid: uuidv4(),
+                                    })),
+                                    }
+                                : {},
+                        })),
+                    });
                     setSavedStatus(data.data.status);
                 }).catch((error) => {
                     if (error.response && error.response.status === 404) {
@@ -130,7 +190,7 @@ export default function SurveyView() {
                     setLoading(false);
                 });
         }
-    }, []);
+    }, [id]);
 
     if (notFound) {
         return <NotFound />;
@@ -163,17 +223,17 @@ export default function SurveyView() {
                 <form action="#" method="POST" onSubmit={onSubmit}>
                     <div className="shadow sm:overflow-hidden sm:rounded-md">
                         <div className="space-y-6 bg-white px-4 py-5 sm:p-6">
-                            {errors && (
-                                <div className="bg-red-500 text-white py-3 px-3">
-                                    {Object.keys(errors).map(key => (
-                                        <p key={key}>{errors[key][0]}</p>
+                            {Object.keys(formErrors).length > 0 && (
+                                <div className="bg-red-500 text-white py-3 px-3 mb-4 rounded">
+                                    {Object.values(formErrors).map((msg, i) => (
+                                        <p key={i} className="text-sm">{msg}</p>
                                     ))}
                                 </div>
                             )}
 
                             {/*Image*/}
                             <div>
-                            <label className="block text-sm font-medium text-gray-700">Image</label>
+                            <label htmlFor="survey-image" className="block text-sm font-medium text-gray-700">Image</label>
                             <div className="mt-1 flex items-center">
                                 {survey.image_url && (
                                     <img src={survey.image_url} alt="" className="w-32 h-32 object-cover" />
@@ -188,7 +248,7 @@ export default function SurveyView() {
                                 type="button"
                                 className="relative ml-5 rounded-md border border-gray-300 bg-white py-2 px-3 text-sm font-medium leading-4 text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
                                 >
-                                <input type="file" className="absolute left-0 top-0 right-0 bottom-0 opacity-0" onChange={onImageChoose}/>
+                                <input id="survey-image" type="file" name="image" className="absolute left-0 top-0 right-0 bottom-0 opacity-0" onChange={onImageChoose}/>
                                 Change
                                 </button>
                             </div>
@@ -258,7 +318,7 @@ export default function SurveyView() {
                                 />
                             </div>
                             <div className="ml-3 text-sm">
-                                <label htmlFor="comments" className="font-medium text-gray-700">
+                                <label htmlFor="status" className="font-medium text-gray-700">
                                 Active
                                 </label>
                                 <p className="text-gray-500">Whether to make survey publicly available</p>
@@ -275,7 +335,11 @@ export default function SurveyView() {
                                 <PlusIcon className="w-4 mr-2"/>
                                 Add Question
                             </button>
-                            <SurveyQuestions questions={survey.questions} onQuestionsUpdate={onQuestionsUpdate} />   
+                            <SurveyQuestions
+                                questions={survey.questions}
+                                errors={questionErrors} 
+                                onQuestionsUpdate={onQuestionsUpdate}
+                            />   
                         </div>
 
                         <div className="bg-gray-50 px-4 py-3 text-right sm:px-6">

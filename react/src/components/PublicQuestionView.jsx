@@ -24,13 +24,15 @@ export default function PublicQuestionView({ question, index, value, answerChang
             {question.type === "select" && (
                 <div>
                 <select
+                    id={`question-${question.id}`}
+                    name={`question-${question.id}`}
                     value={value}
                     onChange={ev => answerChanged(ev.target.value)}
                     className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
                 >
                     <option value="">Please Select</option>
                     {question.data.options.map((option) => (
-                    <option key={option.uuid} value={option.text}>
+                    <option key={option._uuid} value={option.text}>
                         {option.text}
                     </option>
                     ))}
@@ -40,10 +42,10 @@ export default function PublicQuestionView({ question, index, value, answerChang
             {question.type === "radio" && (
                 <div>
                 {question.data.options.map((option) => (
-                    <div key={option.uuid} className="flex items-center">
+                    <div key={option._uuid} className="flex items-center">
                     <input
-                        id={option.uuid}
-                        name={"question" + question.id}
+                        id={option._uuid}
+                        name={`question-${question.id}`}
                         value={option.text}  
                         checked={value === option.text}
                         type="radio"
@@ -51,7 +53,7 @@ export default function PublicQuestionView({ question, index, value, answerChang
                         className="focus:ring-sky-500 h-4 w-4 text-sky-600 border-gray-300"
                     />
                     <label
-                        htmlFor={option.uuid}
+                        htmlFor={option._uuid}
                         className="ml-3 block text-sm font-medium text-gray-700"
                     >
                         {option.text}
@@ -63,16 +65,17 @@ export default function PublicQuestionView({ question, index, value, answerChang
             {question.type === "checkbox" && (
                 <div>
                 {question.data.options.map((option) => (
-                    <div key={option.uuid} className="flex items-center">
+                    <div key={option._uuid} className="flex items-center">
                     <input
-                        id={option.uuid}
+                        id={option._uuid}
+                        name={`question-${question.id}[]`}
                         type="checkbox"
                         checked={value.includes(option.text)}
                         onChange={ev => onCheckboxChange(option, ev)}
                         className="focus:ring-sky-500 h-4 w-4 text-sky-600 border-gray-300 rounded"
                     />
                     <label
-                        htmlFor={option.uuid}
+                        htmlFor={option._uuid}
                         className="ml-3 block text-sm font-medium text-gray-700"
                     >
                         {option.text}
@@ -84,6 +87,8 @@ export default function PublicQuestionView({ question, index, value, answerChang
             {question.type === "text" && (
                 <div>
                 <input
+                    id={`question-${question.id}`}
+                    name={`question-${question.id}`}
                     type="text"
                     value={value}
                     onChange={ev => answerChanged(ev.target.value)}
@@ -94,6 +99,8 @@ export default function PublicQuestionView({ question, index, value, answerChang
             {question.type === "textarea" && (
                 <div>
                 <textarea
+                    id={`question-${question.id}`}
+                    name={`question-${question.id}`}
                     value={value}
                     onChange={ev => answerChanged(ev.target.value)}
                     className="mt-1 focus:ring-sky-500 focus:border-sky-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"

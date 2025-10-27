@@ -1,66 +1,94 @@
 import { v4 as uuidv4 } from "uuid";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
 import { useStateContext } from "../contexts/ContextProvider";
 
 export default function QuestionEditor({
   index = 0,
   question,
+  errors,
   addQuestion,
   deleteQuestion,
   questionChange,
 }) {
-  const [model, setModel] = useState({ ...question });
   const { questionTypes } = useStateContext();
-
-  useEffect(() => {
-    questionChange(model);
-  }, [model]);
+  const options = question.data?.options || [];
 
   function upperCaseFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  function shouldHaveOptions(type = null) {
-    type = type || model.type;
+  function shouldHaveOptions(type) {
     return ["select", "radio", "checkbox"].includes(type);
   }
 
   function onTypeChange(ev) {
-    const newModel = {
-      ...model,
-      type: ev.target.value,
-    };
-    if (!shouldHaveOptions(model.type) && shouldHaveOptions(ev.target.value)) {
-      if (!model.data.options) {
-        newModel.data = {
-          options: [{ uuid: uuidv4(), text: "" }],
-        };
-      }
+    const newType = ev.target.value;
+
+    let newData = question.data || {};
+
+    if (!shouldHaveOptions(question.type) && shouldHaveOptions(newType)) {
+      newData = {
+        ...newData,
+        options: [{ _uuid: uuidv4(), text: "" }],
+      };
     }
-    setModel(newModel);
+
+    if (shouldHaveOptions(question.type) && !shouldHaveOptions(newType)) {
+      newData = {};
+    }
+
+    questionChange(index, {
+      ...question,
+      type: newType,
+      data: newData,
+    });
   }
 
   function addOption() {
-    model.data.options.push({
-      uuid: uuidv4(),
-      text: "",
+    questionChange(index, {
+      ...question,
+      data: {
+        ...question.data,
+        options: [
+          ...(question.data.options || []),
+          { _uuid: uuidv4(), text: "" }
+        ]
+      }
     });
-    setModel({ ...model });
+  }
+  function deleteOption(op) {
+    questionChange(index, {
+      ...question,
+      data: {
+        ...question.data,
+        options: question.data.options.filter(o => o._uuid !== op._uuid)
+      }
+    });
   }
 
-  function deleteOption(op) {
-    model.data.options = model.data.options.filter(option => option.uuid != op.uuid)
-    setModel({...model})
+  function isOptionsValid(question) {
+    if (!["select", "radio", "checkbox"].includes(question.type)) return true;
+    
+    const min = ["radio", "select"].includes(question.type) ? 2 : 1;
+    return question.data?.options?.length >= min;
   }
+
+  const optionErrors = Object.keys(errors?.[index] || {})
+    .filter(key => key.startsWith('data.options'))
+    .map(key => errors[index][key]);
+
+  const optionValues = options.map(op => op.text.trim()).filter(v => v !== "");
+  const duplicatesExist = optionValues.some((v, i) => optionValues.indexOf(v) !== i);
+
+  const showOptionError = duplicatesExist || (errors?.[index]?.['data.options']);
 
   return (
     <>
-      <div className="py-2">
+      <div id={`question-${index}`} className="py-2">
         <div className="flex justify-between mb-3">
           <h4>
-            {index + 1}. {model.question}{" "}
-            {Boolean(model.is_required) && <span className="text-red-600">*</span>}
+            {index + 1}. {question.question}{" "}
+            {Boolean(question.is_required) && <span className="text-red-600">*</span>}
           </h4>
           <div className="flex items-center">
             <button
@@ -95,7 +123,7 @@ export default function QuestionEditor({
                 hover:border-red-600
                 font-semibold
                 "
-              onClick={() => deleteQuestion(question)}
+              onClick={() => deleteQuestion(index)}
             >
               <TrashIcon className="w-4 mr-1" />
               Delete
@@ -106,37 +134,47 @@ export default function QuestionEditor({
           {/* Question Text */}
           <div className="flex-1">
             <label
-              htmlFor="question"
+              htmlFor={`question-text-${index}`}
               className="block text-sm font-medium text-gray-700"
             >
               Question
             </label>
               <input
                 type="text"
-                name="question"
-                id="question"
-                value={model.question}
-                onChange={(ev) =>
-                  setModel({ ...model, question: ev.target.value })
+                name="question_text"
+                id={`question-text-${index}`}
+                value={question.question}
+                onChange={ev =>
+                  questionChange(index, {
+                    ...question,
+                    question: ev.target.value
+                  })
                 }
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm"
                 required
               />
+            {showOptionError && (
+              <div className="text-xs text-red-600 mt-1">
+                {duplicatesExist 
+                  ? "This question has duplicate option values." 
+                  : optionErrors.map((err, i) => <p key={i}>{err}</p>)}
+              </div>
+            )}
           </div>
           {/* Question Text */}
 
           {/* Question Type */}
           <div>
             <label
-              htmlFor="questionType"
+              htmlFor={`question-type-${index}`}
               className="block text-sm font-medium text-gray-700 w-40"
             >
               Question Type
             </label>
             <select
-              id="questionType"
-              name="questionType"
-              value={model.type}
+              id={`question-type-${index}`}
+              name="question_type"
+              value={question.type}
               onChange={onTypeChange}
               className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
             >
@@ -154,17 +192,21 @@ export default function QuestionEditor({
         <div className="flex items-start mb-3">
           <div className="flex h-5 items-center">
               <input
-              id={`required-${index}`}
+              id={`question-required-${index}`}
+              name="question_required"
               type="checkbox"
-              checked={model.is_required}
+              checked={question.is_required}
               onChange={(ev) =>
-                setModel({ ...model, is_required: ev.target.checked })
+                questionChange(index, {
+                  ...question,
+                  is_required: ev.target.checked,
+                })
               }
               className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
               />
           </div>
           <div className="ml-2 text-sm">
-              <label htmlFor={`required-${index}`}className="font-medium text-gray-700">
+              <label htmlFor={`question-required-${index}`} className="font-medium text-gray-700">
               Required
               </label>
           </div>
@@ -173,17 +215,20 @@ export default function QuestionEditor({
         {/*Description*/}
         <div className="mb-3">
           <label
-            htmlFor="questionDescription"
+            htmlFor={`question-description-${index}`}
             className="block text-sm font-medium text-gray-700"
           >
             Description
           </label>
           <textarea
-            name="questionDescription"
-            id="questionDescription"
-            value={model.description || ""}
+            name="question_description"
+            id={`question-description-${index}`}
+            value={question.description || ""}
             onChange={(ev) =>
-              setModel({ ...model, description: ev.target.value })
+              questionChange(index, {
+                ...question,
+                description: ev.target.value,
+              })
             }
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm"
           ></textarea>
@@ -191,7 +236,7 @@ export default function QuestionEditor({
         {/*Description*/}
 
         <div>
-        {shouldHaveOptions() && (
+        {shouldHaveOptions(question.type) && (
           <div>
             <h4 className="text-sm font-semibold mb-1 flex justify-between items-center ">
               Options
@@ -212,22 +257,41 @@ export default function QuestionEditor({
               </button>
             </h4>
 
-            {model.data.options.length === 0 && (
+            {options.length === 0 && (
               <div className="text-xs text-gray-600 text-center py-3">
                 You don't have any options defined
               </div>
             )}
-            {model.data.options.length > 0 && (
+            {options.length > 0 && (
               <div>
-                {model.data.options.map((op, ind) => (
-                  <div key={op.uuid} className="flex items-center mb-1">
+                {options.map((op, ind) => (
+                  <div key={op._uuid} className="flex items-center mb-1">
+                    <label
+                      htmlFor={`question-${index}-option-${ind}`}
+                      className="sr-only"
+                    >
+                      Option {ind + 1} for Question {index + 1}
+                    </label>
                     <span className="w-6 text-sm">{ind + 1}.</span>
                     <input
                       type="text"
+                      id={`question-${index}-option-${ind}`}
+                      name={`question-${index}-option-${ind}`}
                       value={op.text}
-                      onInput={(ev) => {
-                        op.text = ev.target.value;
-                        setModel({ ...model });
+                      onChange={(ev) => {
+                        const newOptions = options.map(o =>
+                          o._uuid === op._uuid
+                            ? { ...o, text: ev.target.value }
+                            : o
+                        );
+
+                        questionChange(index, {
+                          ...question,
+                          data: {
+                            ...question.data,
+                            options: newOptions,
+                          },
+                        });
                       }}
                       className="w-full
                       rounded-sm
@@ -236,9 +300,10 @@ export default function QuestionEditor({
                       text-xs
                       border border-gray-300
                       focus:border-sky-500"
+                      required
                     />
                     <button
-                      onClick={ev => deleteOption(op)}
+                      onClick={() => deleteOption(op)}
                       type="button"
                       className="            h-6
                         w-6
@@ -255,6 +320,11 @@ export default function QuestionEditor({
                   </div>
                 ))}
               </div>
+            )}
+            {!isOptionsValid(question) && !errors?.[index]?.['data.options'] && (
+              <p className="text-xs text-red-600">
+                This question needs at least {question.type === 'checkbox' ? 1 : 2} option{question.type === 'checkbox' ? '' : 's'}.
+              </p>
             )}
           </div>
         )}

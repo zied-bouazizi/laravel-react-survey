@@ -6,7 +6,7 @@ import { useStateContext } from '../contexts/ContextProvider';
 import Head from '../components/Head';
 
 export default function Signup() {
-    const { setCurrentUser, setUserToken } = useStateContext();
+    const { login } = useStateContext();
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -25,8 +25,7 @@ export default function Signup() {
             password_confirmation: passwordConfirmation
         })
         .then(({data}) => {
-            setCurrentUser(data.user);
-            setUserToken(data.token);
+            login(data.user, data.token);
         })
         .catch((error) => {
         if (error.response) {

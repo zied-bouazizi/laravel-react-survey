@@ -17,7 +17,7 @@ function classNames(...classes) {
 }
 
 export default function DefaultLayout() {
-  const { currentUser, userToken, setCurrentUser, setUserToken } = useStateContext()
+  const { currentUser, userToken, setCurrentUser, logout } = useStateContext()
 
   useEffect(() => {
     if (!userToken) return;
@@ -28,13 +28,12 @@ export default function DefaultLayout() {
      })
   }, [userToken, setCurrentUser]);
 
-  const logout = (ev) => {
+  const handleLogout = (ev) => {
     ev.preventDefault();
 
     axiosClient.post('/logout') 
       .then(() => {
-        setCurrentUser({});
-        setUserToken(null);
+        logout();
       });
   }
   
@@ -107,7 +106,7 @@ export default function DefaultLayout() {
                             <Menu.Item>
                               <a
                                 href="#"
-                                onClick={(ev) => logout(ev)}
+                                onClick={handleLogout}
                                 className="block px-4 py-2 text-sm text-gray-700"
                               >
                                 Sign out
@@ -164,7 +163,7 @@ export default function DefaultLayout() {
                         <Disclosure.Button
                           as="a"
                           href="#"
-                          onClick={(ev) => logout(ev)}
+                          onClick={handleLogout}
                           className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
                         >
                           Sign out

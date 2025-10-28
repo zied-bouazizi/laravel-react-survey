@@ -6,7 +6,7 @@ import axiosClient from '../axios';
 import Head from '../components/Head';
 
 export default function Login() {
-    const { setCurrentUser, setUserToken } = useStateContext();
+    const { login } = useStateContext();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [remember, setRemember] = useState(false);
@@ -22,8 +22,7 @@ export default function Login() {
             remember,
         })
         .then(({data}) => {
-            setCurrentUser(data.user);
-            setUserToken(data.token);
+            login(data.user, data.token);
         })
         .catch(({response}) => {
         if (response.data.error) {

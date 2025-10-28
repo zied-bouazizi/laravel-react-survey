@@ -13,9 +13,7 @@ axiosClient.interceptors.response.use((response) => {
   return response;
 }, (error) => {
   if (error.response && error.response.status === 401) {
-    localStorage.removeItem('TOKEN');
-    window.location.reload();
-    return error;
+    window.dispatchEvent(new Event("auth-logout"));
   }
   throw error;
 });

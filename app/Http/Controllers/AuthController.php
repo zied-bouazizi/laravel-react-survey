@@ -20,7 +20,12 @@ class AuthController extends Controller
             'email' => $data['email'],
             'password' => bcrypt($data['password'])
         ]);
-        $token = $user->createToken('main')->plainTextToken;
+
+        $tokenResult = $user->createToken('main');
+        $tokenResult->accessToken->expires_at = now()->addMinutes(120);
+        $tokenResult->accessToken->save();
+
+        $token = $tokenResult->plainTextToken;
 
         return response([
             'user' => $user,
@@ -34,14 +39,23 @@ class AuthController extends Controller
         $remember = $credentials['remember'] ?? false;
         unset($credentials['remember']);
 
-        if (!Auth::attempt($credentials, $remember)) {
+        if (!Auth::attempt($credentials)) {
             return response([
                 'error' => 'The provided credentials are incorrect.'
             ], 422);
         }
+
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $token = $user->createToken('main')->plainTextToken;
+
+        $tokenName = $remember ? 'main_remember' : 'main';
+        $tokenResult = $user->createToken($tokenName);
+        $token = $tokenResult->plainTextToken;
+
+        if (!$remember) {
+            $tokenResult->accessToken->expires_at = now()->addMinutes(120);
+            $tokenResult->accessToken->save();
+        }
 
         return response([
             'user' => $user,
@@ -51,9 +65,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
-        $user->currentAccessToken()->delete();
+       $request->user()?->currentAccessToken()?->delete();
 
         return response([
             'success' => true

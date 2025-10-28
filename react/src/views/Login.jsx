@@ -9,6 +9,7 @@ export default function Login() {
     const { setCurrentUser, setUserToken } = useStateContext();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [remember, setRemember] = useState(false);
     const [error, setError] = useState({ __html: "" });
 
     const onSubmit = (ev) => {
@@ -17,7 +18,8 @@ export default function Login() {
 
         axiosClient.post('/login', {
             email,
-            password
+            password,
+            remember,
         })
         .then(({data}) => {
             setCurrentUser(data.user);
@@ -55,7 +57,6 @@ export default function Login() {
             )}
 
             <form onSubmit={onSubmit} className="mt-8 space-y-6" action="#" method="POST">
-                <input type="hidden" name="remember" defaultValue="true" />
                 <div className="-space-y-px rounded-md shadow-sm">
                 <div>
                     <label htmlFor="email-address" className="sr-only">
@@ -97,6 +98,8 @@ export default function Login() {
                         id="remember-me"
                         name="remember-me"
                         type="checkbox"
+                        checked={remember}
+                        onChange={ev => setRemember(ev.target.checked)}
                         className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
                         />
                         <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">

@@ -19,9 +19,14 @@ function classNames(...classes) {
 export default function DefaultLayout() {
   const { currentUser, userToken, setCurrentUser, setUserToken } = useStateContext()
 
-  if(!userToken) {
-    return <Navigate to="/login" />
-  }
+  useEffect(() => {
+    if (!userToken) return;
+
+    axiosClient.get('/me')
+     .then(({data}) => {
+        setCurrentUser(data.user);
+     })
+  }, [userToken, setCurrentUser]);
 
   const logout = (ev) => {
     ev.preventDefault();
@@ -32,13 +37,10 @@ export default function DefaultLayout() {
         setUserToken(null);
       });
   }
-
-  useEffect(() => {
-    axiosClient.get('/me')
-     .then(({data}) => {
-        setCurrentUser(data.user);
-     })
-  }, []);
+  
+  if(!userToken) {
+    return <Navigate to="/login" />
+  }
 
   return (
     <>

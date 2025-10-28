@@ -64,6 +64,7 @@ export default function Signup() {
                         id="full-name"
                         name="name"
                         type="text"
+                        autoComplete="name"
                         required
                         value={fullName}
                         onChange={ev => setFullName(ev.target.value)}
@@ -95,7 +96,7 @@ export default function Signup() {
                     id="password"
                     name="password"
                     type="password"
-                    autoComplete="current-password"
+                    autoComplete="new-password"
                     required
                     value={password}
                     onChange={ev => setPassword(ev.target.value)}
@@ -111,6 +112,7 @@ export default function Signup() {
                     id="password-confirmation"
                     name="password_confirmation"
                     type="password"
+                    autoComplete="new-password"
                     required
                     value={passwordConfirmation}
                     onChange={ev => setPasswordConfirmation(ev.target.value)}

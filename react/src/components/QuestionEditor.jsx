@@ -85,12 +85,13 @@ export default function QuestionEditor({
   return (
     <>
       <div id={`question-${index}`} className="py-2">
-        <div className="flex justify-between mb-3">
-          <h4>
-            {index + 1}. {question.question}{" "}
-            {Boolean(question.is_required) && <span className="text-red-600">*</span>}
+        <div className="flex justify-between items-start mb-3">
+          <h4 className="flex-1 min-w-0 break-words">
+            <span className="whitespace-nowrap">{index + 1}.&nbsp;</span>
+            {question.question}
+            {question.is_required && <span className="text-red-600">*</span>}
           </h4>
-          <div className="flex items-center">
+          <div className="flex items-center ml-2">
             <button
               type="button"
               className="

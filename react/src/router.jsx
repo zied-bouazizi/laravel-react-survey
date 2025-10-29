@@ -3,62 +3,85 @@ import Dashboard from "./views/Dashboard";
 import Surveys from "./views/Surveys";
 import Login from "./views/Login";
 import Signup from "./views/Signup";
-import GuestLayout from "./components/GuestLayout";
-import DefaultLayout from "./components/DefaultLayout";
+import RootLayout from "./layouts/RootLayout";
+import GuestLayout from "./layouts/GuestLayout";
+import DefaultLayout from "./layouts/DefaultLayout";
 import SurveyView from "./views/SurveyView";
 import SurveyPublicView from "./views/SurveyPublicView";
 import NotFound from "./views/NotFound";
 
 const router = createBrowserRouter([
-    {
-        path: "/",
+  {
+    element: <RootLayout />,
+    children: [
+      {
         element: <DefaultLayout />,
         children: [
-            {
-                path: "/dashboard",
-                element: <Navigate to="/" />
+          {
+            path: "/dashboard",
+            element: <Navigate to="/" />,
+          },
+          {
+            path: "/",
+            element: <Dashboard />,
+            handle: {
+              title: "Dashboard",
             },
-            {
-                path: "/",
-                element: <Dashboard />
+          },
+          {
+            path: "/surveys",
+            element: <Surveys />,
+            handle: {
+              title: "Surveys",
             },
-            {
-                path: "/surveys",
-                element: <Surveys />
+          },
+          {
+            path: "/surveys/create",
+            element: <SurveyView />,
+            handle: {
+              title: "Create Survey",
             },
-            {
-                path: "/surveys/create",
-                element: <SurveyView />
+          },
+          {
+            path: "/surveys/:id",
+            element: <SurveyView />,
+            handle: {
+              title: "Edit Survey",
             },
-            ,
-            {
-                path: "/surveys/:id",
-                element: <SurveyView />
-            },
-        ]
-    },
-    {
-        path: "/",
+          },
+        ],
+      },
+      {
         element: <GuestLayout />,
         children: [
-            {
-                path: "/login",
-                element: <Login />
+          {
+            path: "/login",
+            element: <Login />,
+            handle: {
+              title: "Login",
             },
-            {
-                path: "/signup",
-                element: <Signup />
-            }
-        ]
-    },
-    {
+          },
+          {
+            path: "/signup",
+            element: <Signup />,
+            handle: {
+              title: "Signup",
+            },
+          },
+        ],
+      },
+      {
         path: "/survey/public/:slug",
-        element: <SurveyPublicView />
-    },
-    {
-        path: "/*",
-        element: <NotFound />
-    },
+        element: <SurveyPublicView />,
+        handle: { title: "Survey" },
+      },
+      {
+        path: "*",
+        element: <NotFound />,
+        handle: { title: "Not Found" },
+      },
+    ],
+  },
 ]);
 
 export default router;

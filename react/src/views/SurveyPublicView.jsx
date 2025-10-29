@@ -77,7 +77,7 @@ export default function SurveyPublicView() {
 
     return (
         <>
-            <Head title={survey.title} />
+            {!loading && (<Head title={survey.title} description={survey.description} />)}
             <div className="py-2">
                 {loading && <div className="flex justify-center">Loading...</div>}
                 {!loading && (

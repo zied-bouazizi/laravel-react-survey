@@ -1,9 +1,9 @@
-import Head from "../components/Head";
+import RouteTitleManager from "../components/RouteTitleManager";
 
-export default function NotFound() {
+export default function NotFound({ overrideTitle }) {
   return (
     <>
-      <Head title="Page Not Found" />
+      {overrideTitle && <RouteTitleManager overrideTitle={overrideTitle} />}
       <main className="grid min-h-full place-items-center bg-gray-100 px-6 py-24 sm:py-32 lg:px-8">
         <div className="text-center">
           <p className="text-3xl font-semibold text-sky-600">404</p>

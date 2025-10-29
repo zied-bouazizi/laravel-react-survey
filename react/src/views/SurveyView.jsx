@@ -8,7 +8,7 @@ import TButton from "../components/core/TButton.jsx";
 import { v4 as uuidv4 } from "uuid";
 import { useStateContext } from "../contexts/ContextProvider.jsx";
 import NotFound from "./NotFound.jsx";
-import Unauthorized from "./Unauthorized.jsx";
+import Forbidden from "./Forbidden.jsx";
 import DeleteSurveyModal from "../components/DeleteSurveyModal.jsx";
 
 export default function SurveyView() {
@@ -28,7 +28,7 @@ export default function SurveyView() {
     const [savedStatus, setSavedStatus] = useState(false);
     const [loading, setLoading] = useState(false);
     const [notFound, setNotFound] = useState(false);
-    const [unauthorized, setUnauthorized] = useState(false);
+    const [forbidden, setForbidden] = useState(false);
     const [formErrors, setFormErrors] = useState({});
     const [questionErrors, setQuestionErrors] = useState({});
     const [surveyToDelete, setSurveyToDelete] = useState(null);
@@ -183,7 +183,7 @@ export default function SurveyView() {
                     if (error.response && error.response.status === 404) {
                         setNotFound(true);
                     } else if (error.response && error.response.status === 403) {
-                        setUnauthorized(true);
+                        setForbidden(true);
                     }
                 })
                 .finally(() => {
@@ -193,11 +193,11 @@ export default function SurveyView() {
     }, [id]);
 
     if (notFound) {
-        return <NotFound />;
+        return <NotFound overrideTitle="Not Found" />;
     }
 
-    if (unauthorized) {
-        return <Unauthorized />;
+    if (forbidden) {
+        return <Forbidden overrideTitle="Forbidden" />;
     }
 
     return (

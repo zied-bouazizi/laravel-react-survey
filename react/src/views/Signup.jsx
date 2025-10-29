@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom'
 import axiosClient from '../axios';
 import { useStateContext } from '../contexts/ContextProvider';
-import Head from '../components/Head';
 
 export default function Signup() {
     const { login } = useStateContext();
@@ -37,8 +36,6 @@ export default function Signup() {
 
     return (
         <>
-            <Head title="Signup" />
-
             <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
                 Signup for free
             </h2>

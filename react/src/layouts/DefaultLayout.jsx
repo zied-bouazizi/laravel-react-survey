@@ -4,8 +4,8 @@ import { Bars3Icon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Link, Navigate, NavLink, Outlet } from "react-router-dom";
 import { useStateContext } from '../contexts/ContextProvider';
 import axiosClient from '../axios';
-import Toast from './Toast';
-import ApplicationLogo from './ApplicationLogo';
+import Toast from '../components/Toast';
+import ApplicationLogo from '../components/ApplicationLogo';
 
 const navigation = [
   { name: 'Dashboard', to: '/' },

@@ -15,14 +15,36 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       {
+        element: <GuestLayout />,
+        children: [
+          {
+            path: "/",
+            element: <Login />,
+            handle: {
+              title: "Login",
+            },
+          },
+          {
+            path: "/login",
+            element: <Navigate to="/" />,
+            handle: {
+              title: "Login",
+            },
+          },
+          {
+            path: "/signup",
+            element: <Signup />,
+            handle: {
+              title: "Signup",
+            },
+          },
+        ],
+      },
+      {
         element: <DefaultLayout />,
         children: [
           {
             path: "/dashboard",
-            element: <Navigate to="/" />,
-          },
-          {
-            path: "/",
             element: <Dashboard />,
             handle: {
               title: "Dashboard",
@@ -47,25 +69,6 @@ const router = createBrowserRouter([
             element: <SurveyView />,
             handle: {
               title: "Edit Survey",
-            },
-          },
-        ],
-      },
-      {
-        element: <GuestLayout />,
-        children: [
-          {
-            path: "/login",
-            element: <Login />,
-            handle: {
-              title: "Login",
-            },
-          },
-          {
-            path: "/signup",
-            element: <Signup />,
-            handle: {
-              title: "Signup",
             },
           },
         ],

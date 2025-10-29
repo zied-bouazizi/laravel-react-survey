@@ -41,7 +41,7 @@ export default function Signup() {
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
                 Or{' '}
-                <Link to="/login" className="font-medium text-sky-600 hover:text-sky-500">
+                <Link to="/" className="font-medium text-sky-600 hover:text-sky-500">
                 Login with your account
                 </Link>
             </p>

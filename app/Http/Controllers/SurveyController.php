@@ -10,6 +10,7 @@ use App\Http\Resources\SurveyResource;
 use App\Models\SurveyAnswer;
 use App\Models\SurveyQuestion;
 use App\Models\SurveyQuestionAnswer;
+use App\Notifications\SurveyAnsweredNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -231,15 +232,20 @@ class SurveyController extends Controller
         $answers = $request->input('answers', []);
 
         foreach ($answers as $questionId => $answer) {
-            if ($answer !== null && !(is_string($answer) && trim($answer) === '') && !(is_array($answer) && count($answer) === 0)) { 
+            if ($answer !== null && !(is_string($answer) && trim($answer) === '') && !(is_array($answer) && count($answer) === 0)) {
                 $data = [
-                'survey_question_id' => $questionId,
-                'survey_answer_id' => $surveyAnswer->id,
-                'answer' => is_array($answer) ? json_encode($answer) : $answer
-            ];
+                    'survey_question_id' => $questionId,
+                    'survey_answer_id' => $surveyAnswer->id,
+                    'answer' => is_array($answer) ? json_encode($answer) : $answer,
+                ];
 
-            SurveyQuestionAnswer::create($data);
+                SurveyQuestionAnswer::create($data);
             }
+        }
+
+        $survey->loadMissing('user');
+        if ($survey->user) {
+            $survey->user->notify(new SurveyAnsweredNotification($survey, $surveyAnswer));
         }
 
         return response("", 201);
